@@ -10,7 +10,7 @@ namespace LML_Installer
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new installer());
+            Application.Run(new Installer());
         }
     }
 }
