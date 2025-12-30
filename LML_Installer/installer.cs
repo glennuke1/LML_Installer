@@ -30,11 +30,11 @@ namespace LML_Installer
             InitializeComponent();
         }
 
-        static string mscpath;
+        static string mwcpath;
 
         private void InstallButton_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(mscpath))
+            if (string.IsNullOrWhiteSpace(mwcpath))
             {
                 MessageBox.Show("Specify msc path");
                 return;
@@ -44,19 +44,19 @@ namespace LML_Installer
 
         void Install()
         {
-            if (!Directory.Exists(Path.Combine(mscpath, "mods")))
+            if (!Directory.Exists(Path.Combine(mwcpath, "mods")))
             {
-                Directory.CreateDirectory(Path.Combine(mscpath, "mods"));
+                Directory.CreateDirectory(Path.Combine(mwcpath, "mods"));
             }
 
-            if (!Directory.Exists(Path.Combine(mscpath, "mods", "Config")))
+            if (!Directory.Exists(Path.Combine(mwcpath, "mods", "Config")))
             {
-                Directory.CreateDirectory(Path.Combine(mscpath, "mods", "Config"));
+                Directory.CreateDirectory(Path.Combine(mwcpath, "mods", "Config"));
             }
 
-            if (!Directory.Exists(Path.Combine(mscpath, "mods", "Assets")))
+            if (!Directory.Exists(Path.Combine(mwcpath, "mods", "Assets")))
             {
-                Directory.CreateDirectory(Path.Combine(mscpath, "mods", "Assets"));
+                Directory.CreateDirectory(Path.Combine(mwcpath, "mods", "Assets"));
             }
 
             progressBar.Visible = true;
@@ -80,33 +80,33 @@ namespace LML_Installer
             }
 
             ZipFile zip = ZipFile.Read("doorstop.zip");
-            zip.ExtractAll(mscpath, ExtractExistingFileAction.OverwriteSilently);
+            zip.ExtractAll(mwcpath, ExtractExistingFileAction.OverwriteSilently);
             zip.Dispose();
 
             progressBar.PerformStep();
 
             ZipFile zip2 = ZipFile.Read("NeededDLLS.zip");
-            zip2.ExtractAll(Path.Combine(mscpath, "mysummercar_Data\\Managed"), ExtractExistingFileAction.OverwriteSilently);
+            zip2.ExtractAll(Path.Combine(mwcpath, "mywintercar_Data\\Managed"), ExtractExistingFileAction.OverwriteSilently);
             zip2.Dispose();
 
             progressBar.PerformStep();
 
             using (var client = new WebClient())
             {
-                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LightspeedModLoader/Builds/LightspeedModLoader.dll", mscpath + "/mysummercar_Data/Managed/LightspeedModLoader.dll");
+                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LightspeedModLoader/Builds/LightspeedModLoader.dll", mwcpath + "/mywintercar_Data/Managed/LightspeedModLoader.dll");
                 progressBar.PerformStep();
-                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LightspeedModLoader/Builds/MSCLoader.dll", mscpath + "/mysummercar_Data/Managed/MSCLoader.dll");
+                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LightspeedModLoader/Builds/MSCLoader.dll", mwcpath + "/mywintercar_Data/Managed/MSCLoader.dll");
                 progressBar.PerformStep();
-                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LightspeedModLoader/Builds/VERSION", mscpath + "/LML_VERSION");
+                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LightspeedModLoader/Builds/VERSION", mwcpath + "/LML_VERSION");
                 progressBar.PerformStep();
-                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LightspeedModLoader/Builds/LML_AutoUpdater.exe", mscpath + "/mysummercar_Data/Managed/LML_AutoUpdater.exe");
+                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LightspeedModLoader/Builds/LML_AutoUpdater.exe", mwcpath + "/mywintercar_Data/Managed/LML_AutoUpdater.exe");
 
                 progressBar.PerformStep();
-                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/Official%20Mods/LML_Default_Console.dll", mscpath + "/mods/LML_Default_Console.dll");
+                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/Official%20Mods/LML_Default_Console.dll", mwcpath + "/mods/LML_Default_Console.dll");
                 progressBar.PerformStep();
-                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/Official%20Mods/LML_Default_ModSettings.dll", mscpath + "/mods/LML_Default_ModSettings.dll");
+                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/Official%20Mods/LML_Default_ModSettings.dll", mwcpath + "/mods/LML_Default_ModSettings.dll");
                 progressBar.PerformStep();
-                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/Official%20Mods/LML_DevToolset.dll", mscpath + "/mods/LML_DevToolset.dll");
+                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/Official%20Mods/LML_DevToolset.dll", mwcpath + "/mods/LML_DevToolset.dll");
                 progressBar.PerformStep();
             }
         }
@@ -117,43 +117,43 @@ namespace LML_Installer
             dlg.Filter = "EXE Files (*.exe)|*.exe|All Files (*.*)|*.*";
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                mscpath = Path.GetDirectoryName(dlg.FileName);
-                mscpathLabel.Text = mscpath;
+                mwcpath = Path.GetDirectoryName(dlg.FileName);
+                mscpathLabel.Text = mwcpath;
                 return;
             }
         }
 
         private void UninstallButton_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(mscpath))
+            if (string.IsNullOrWhiteSpace(mwcpath))
             {
                 MessageBox.Show("Specify msc path");
                 return;
             }
 
-            if (File.Exists(mscpath + "/doorstop_config.ini"))
+            if (File.Exists(mwcpath + "/doorstop_config.ini"))
             {
-                File.Delete(mscpath + "/doorstop_config.ini");
+                File.Delete(mwcpath + "/doorstop_config.ini");
             }
 
-            if (File.Exists(mscpath + "/mysummercar_Data/Managed/LightspeedModLoader.dll"))
+            if (File.Exists(mwcpath + "/mywintercar_Data/Managed/LightspeedModLoader.dll"))
             {
-                File.Delete(mscpath + "/mysummercar_Data/Managed/LightspeedModLoader.dll");
+                File.Delete(mwcpath + "/mywintercar_Data/Managed/LightspeedModLoader.dll");
             }
 
-            if (File.Exists(mscpath + "/mysummercar_Data/Managed/LML_AutoUpdater.exe"))
+            if (File.Exists(mwcpath + "/mywintercar_Data/Managed/LML_AutoUpdater.exe"))
             {
-                File.Delete(mscpath + "/mysummercar_Data/Managed/LML_AutoUpdater.exe");
+                File.Delete(mwcpath + "/mywintercar_Data/Managed/LML_AutoUpdater.exe");
             }
 
-            if (File.Exists(mscpath + "/mysummercar_Data/Managed/MSCLoader.dll"))
+            if (File.Exists(mwcpath + "/mywintercar_Data/Managed/MSCLoader.dll"))
             {
-                File.Delete(mscpath + "/mysummercar_Data/Managed/MSCLoader.dll");
+                File.Delete(mwcpath + "/mywintercar_Data/Managed/MSCLoader.dll");
             }
 
-            if (File.Exists(mscpath + "/mysummercar_Data/Managed/MSCLoader.Preloader.dll"))
+            if (File.Exists(mwcpath + "/mywintercar_Data/Managed/MSCLoader.Preloader.dll"))
             {
-                File.Delete(mscpath + "/mysummercar_Data/Managed/MSCLoader.Preloader.dll");
+                File.Delete(mwcpath + "/mywintercar_Data/Managed/MSCLoader.Preloader.dll");
             }
 
             MessageBox.Show("Uninstalled");
@@ -174,18 +174,18 @@ namespace LML_Installer
                 this.Size = new Size(saveData.width, saveData.height);
                 this.Location = new Point(saveData.locX, saveData.locY);
 
-                mscpath = saveData.mscpath;
+                mwcpath = saveData.mscpath;
                 mscpathLabel.Text = saveData.mscpath;
             }
 
-            if (string.IsNullOrWhiteSpace(mscpath))
+            if (string.IsNullOrWhiteSpace(mwcpath))
             {
-                mscpath = GetMySummerCarPath();
-                mscpathLabel.Text = mscpath;
+                mwcpath = GetMyWinterCarPath();
+                mscpathLabel.Text = mwcpath;
             }
         }
 
-        static string GetMySummerCarPath()
+        static string GetMyWinterCarPath()
         {
             try
             {
@@ -213,7 +213,7 @@ namespace LML_Installer
                             if (line.Contains("path"))
                             {
                                 string libraryPath = line.Split('"')[3].Replace("\\\\", "\\");
-                                string mscPath = Path.Combine(libraryPath, "steamapps", "common", "My Summer Car");
+                                string mscPath = Path.Combine(libraryPath, "steamapps", "common", "My Winter Car");
 
                                 if (Directory.Exists(mscPath))
                                     return mscPath;
@@ -221,7 +221,7 @@ namespace LML_Installer
                         }
                     }
 
-                    string defaultPath = Path.Combine(steamPath.ToString(), "steamapps", "common", "My Summer Car");
+                    string defaultPath = Path.Combine(steamPath.ToString(), "steamapps", "common", "My Winter Car");
                     if (Directory.Exists(defaultPath))
                         return defaultPath;
                 }
@@ -238,7 +238,7 @@ namespace LML_Installer
         {
             SaveData saveData = new SaveData()
             {
-                mscpath = mscpath,
+                mscpath = mwcpath,
                 width = this.Size.Width,
                 height = this.Size.Height,
                 locX = this.Location.X,
