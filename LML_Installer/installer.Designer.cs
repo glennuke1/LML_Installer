@@ -89,7 +89,7 @@ namespace LML_Installer
             this.SelectMSCButton.Name = "SelectMSCButton";
             this.SelectMSCButton.Size = new System.Drawing.Size(212, 32);
             this.SelectMSCButton.TabIndex = 2;
-            this.SelectMSCButton.Text = "Select MSC EXE";
+            this.SelectMSCButton.Text = "Select MWC EXE";
             this.SelectMSCButton.UseVisualStyleBackColor = false;
             this.SelectMSCButton.Click += new System.EventHandler(this.SelectMSCButton_Click);
             // 
