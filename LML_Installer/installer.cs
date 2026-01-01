@@ -1,6 +1,4 @@
-﻿using Ionic.Zip;
-using Microsoft.Win32;
-using Newtonsoft.Json;
+﻿using Microsoft.Win32;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -28,9 +26,33 @@ namespace LML_Installer
         public Installer()
         {
             InitializeComponent();
+
+            string baseDir = AppContext.BaseDirectory;
+
+            string newtonsoftPath = Path.Combine(baseDir, "Newtonsoft.Json.dll");
+            string ionicPath = Path.Combine(baseDir, "Ionic.Zip.dll");
+
+            if (!File.Exists(ionicPath))
+            {
+                downloadingInstallerRefs = true;
+                using (var client = new WebClient())
+                {
+                    client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LML_Installer/Ionic.Zip.dll", ionicPath);
+                }
+            }
+
+            if (!File.Exists(newtonsoftPath))
+            {
+                downloadingInstallerRefs = true;
+                using (var client = new WebClient())
+                {
+                    client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LML_Installer/Newtonsoft.Json.dll", newtonsoftPath);
+                }
+            }
         }
 
         static string mwcpath;
+        static bool downloadingInstallerRefs;
 
         private void InstallButton_Click(object sender, EventArgs e)
         {
@@ -79,14 +101,14 @@ namespace LML_Installer
                 progressBar.PerformStep();
             }
 
-            ZipFile zip = ZipFile.Read("doorstop.zip");
-            zip.ExtractAll(mwcpath, ExtractExistingFileAction.OverwriteSilently);
+            Ionic.Zip.ZipFile zip = Ionic.Zip.ZipFile.Read("doorstop.zip");
+            zip.ExtractAll(mwcpath, Ionic.Zip.ExtractExistingFileAction.OverwriteSilently);
             zip.Dispose();
 
             progressBar.PerformStep();
 
-            ZipFile zip2 = ZipFile.Read("NeededDLLS.zip");
-            zip2.ExtractAll(Path.Combine(mwcpath, "mywintercar_Data\\Managed"), ExtractExistingFileAction.OverwriteSilently);
+            Ionic.Zip.ZipFile zip2 = Ionic.Zip.ZipFile.Read("NeededDLLS.zip");
+            zip2.ExtractAll(Path.Combine(mwcpath, "mywintercar_Data\\Managed"), Ionic.Zip.ExtractExistingFileAction.OverwriteSilently);
             zip2.Dispose();
 
             progressBar.PerformStep();
@@ -169,7 +191,7 @@ namespace LML_Installer
             if (File.Exists(path))
             {
                 string json = File.ReadAllText(path);
-                SaveData saveData = JsonConvert.DeserializeObject<SaveData>(json);
+                SaveData saveData = Newtonsoft.Json.JsonConvert.DeserializeObject<SaveData>(json);
 
                 this.Size = new Size(saveData.width, saveData.height);
                 this.Location = new Point(saveData.locX, saveData.locY);
@@ -245,7 +267,7 @@ namespace LML_Installer
                 locY = this.Location.Y
             };
 
-            string json = JsonConvert.SerializeObject(saveData);
+            string json = Newtonsoft.Json.JsonConvert.SerializeObject(saveData);
             string path = Path.Combine(Application.LocalUserAppDataPath, "save.json");
             File.WriteAllText(path, json);
         }
