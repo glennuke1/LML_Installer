@@ -228,7 +228,7 @@ namespace LML_Installer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error finding MSC: " + ex.Message);
+                Console.WriteLine("Error finding MWC: " + ex.Message);
             }
 
             return null;
