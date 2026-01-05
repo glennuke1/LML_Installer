@@ -1,11 +1,10 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.IO;
-using System.Net;
+using System.Net.Http;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace LML_Installer
@@ -32,39 +31,51 @@ namespace LML_Installer
             string newtonsoftPath = Path.Combine(baseDir, "Newtonsoft.Json.dll");
             string ionicPath = Path.Combine(baseDir, "Ionic.Zip.dll");
 
+
             if (!File.Exists(ionicPath))
             {
-                downloadingInstallerRefs = true;
-                using (var client = new WebClient())
+                using (var http = new HttpClient())
                 {
-                    client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LML_Installer/Ionic.Zip.dll", ionicPath);
+                    http.DefaultRequestHeaders.UserAgent.ParseAdd("LightspeedModLoader-Installer");
+
+                    var data = http.GetByteArrayAsync(
+                        "https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LML_Installer/Ionic.Zip.dll"
+                    ).GetAwaiter().GetResult();
+
+                    File.WriteAllBytes(ionicPath, data);
                 }
             }
 
             if (!File.Exists(newtonsoftPath))
             {
-                downloadingInstallerRefs = true;
-                using (var client = new WebClient())
+                using (var http = new HttpClient())
                 {
-                    client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LML_Installer/Newtonsoft.Json.dll", newtonsoftPath);
+                    http.DefaultRequestHeaders.UserAgent.ParseAdd("LightspeedModLoader-Installer");
+
+                    var data = http.GetByteArrayAsync(
+                        "https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LML_Installer/Newtonsoft.Json.dll"
+                    ).GetAwaiter().GetResult();
+
+                    File.WriteAllBytes(newtonsoftPath, data);
                 }
             }
         }
 
         static string mwcpath;
-        static bool downloadingInstallerRefs;
 
-        private void InstallButton_Click(object sender, EventArgs e)
+        private async void InstallButton_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(mwcpath))
             {
-                MessageBox.Show("Specify msc path");
+                MessageBox.Show("Specify mwc path");
                 return;
             }
-            Install();
+            InstallButton.Enabled = false;
+            await Install();
+            InstallButton.Enabled = true;
         }
 
-        void Install()
+        async Task Install()
         {
             if (!Directory.Exists(Path.Combine(mwcpath, "mods")))
             {
@@ -83,7 +94,7 @@ namespace LML_Installer
 
             progressBar.Visible = true;
 
-            InstallFiles();
+            await InstallFiles();
 
             progressBar.Visible = false;
             progressBar.Value = 0;
@@ -91,13 +102,26 @@ namespace LML_Installer
             MessageBox.Show("Installed");
         }
 
-        void InstallFiles()
+        async Task InstallFiles()
         {
-            using (var client = new WebClient())
+            using (var http = new HttpClient())
             {
-                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LightspeedModLoader/Builds/doorstop.zip", "doorstop.zip");
+                http.DefaultRequestHeaders.UserAgent.ParseAdd("LightspeedModLoader-Installer");
+
+                var data = await http.GetByteArrayAsync(
+                    "https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LightspeedModLoader/Builds/doorstop.zip"
+                );
+
+                File.WriteAllBytes("doorstop.zip", data);
+
                 progressBar.PerformStep();
-                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LightspeedModLoader/Builds/NeededDLLS.zip", "NeededDLLS.zip");
+
+                data = await http.GetByteArrayAsync(
+                    "https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LightspeedModLoader/Builds/NeededDLLS.zip"
+                );
+
+                File.WriteAllBytes("NeededDLLS.zip", data);
+
                 progressBar.PerformStep();
             }
 
@@ -113,22 +137,51 @@ namespace LML_Installer
 
             progressBar.PerformStep();
 
-            using (var client = new WebClient())
+            using (var http = new HttpClient())
             {
-                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LightspeedModLoader/Builds/LightspeedModLoader.dll", mwcpath + "/mywintercar_Data/Managed/LightspeedModLoader.dll");
-                progressBar.PerformStep();
-                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LightspeedModLoader/Builds/MSCLoader.dll", mwcpath + "/mywintercar_Data/Managed/MSCLoader.dll");
-                progressBar.PerformStep();
-                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LightspeedModLoader/Builds/VERSION", mwcpath + "/LML_VERSION");
-                progressBar.PerformStep();
-                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LightspeedModLoader/Builds/LML_AutoUpdater.exe", mwcpath + "/mywintercar_Data/Managed/LML_AutoUpdater.exe");
+                http.DefaultRequestHeaders.UserAgent.ParseAdd("LightspeedModLoader-Installer");
 
+                byte[] data = await http.GetByteArrayAsync(
+                    "https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LightspeedModLoader/Builds/LightspeedModLoader.dll"
+                );
+                File.WriteAllBytes(Path.Combine(mwcpath, "mywintercar_Data", "Managed", "LightspeedModLoader.dll"), data);
                 progressBar.PerformStep();
-                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/Official%20Mods/LML_Default_Console.dll", mwcpath + "/mods/LML_Default_Console.dll");
+
+                data = await http.GetByteArrayAsync(
+                    "https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LightspeedModLoader/Builds/MSCLoader.dll"
+                );
+                File.WriteAllBytes(Path.Combine(mwcpath, "mywintercar_Data", "Managed", "MSCLoader.dll"), data);
                 progressBar.PerformStep();
-                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/Official%20Mods/LML_Default_ModSettings.dll", mwcpath + "/mods/LML_Default_ModSettings.dll");
+
+                data = await http.GetByteArrayAsync(
+                    "https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LightspeedModLoader/Builds/VERSION"
+                );
+                File.WriteAllBytes(Path.Combine(mwcpath, "LML_VERSION"), data);
                 progressBar.PerformStep();
-                client.DownloadFile("https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/Official%20Mods/LML_DevToolset.dll", mwcpath + "/mods/LML_DevToolset.dll");
+
+                data = await http.GetByteArrayAsync(
+                    "https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/LightspeedModLoader/Builds/LML_AutoUpdater.exe"
+                );
+                File.WriteAllBytes(Path.Combine(mwcpath, "mywintercar_Data", "Managed", "LML_AutoUpdater.exe"), data);
+                progressBar.PerformStep();
+
+                data = await http.GetByteArrayAsync(
+                    "https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/Official%20Mods/LML_Default_Console.dll"
+                );
+                Directory.CreateDirectory(Path.Combine(mwcpath, "mods"));
+                File.WriteAllBytes(Path.Combine(mwcpath, "mods", "LML_Default_Console.dll"), data);
+                progressBar.PerformStep();
+
+                data = await http.GetByteArrayAsync(
+                    "https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/Official%20Mods/LML_Default_ModSettings.dll"
+                );
+                File.WriteAllBytes(Path.Combine(mwcpath, "mods", "LML_Default_ModSettings.dll"), data);
+                progressBar.PerformStep();
+
+                data = await http.GetByteArrayAsync(
+                    "https://github.com/glennuke1/LightspeedModLoader/raw/refs/heads/master/Official%20Mods/LML_DevToolset.dll"
+                );
+                File.WriteAllBytes(Path.Combine(mwcpath, "mods", "LML_DevToolset.dll"), data);
                 progressBar.PerformStep();
             }
         }
